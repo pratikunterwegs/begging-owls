@@ -6,6 +6,8 @@ editor_options:
 ```{r}
 library(data.table)
 library(readxl)
+
+library(ggplot2)
 ```
 
 ## Load data
@@ -48,3 +50,20 @@ setnames(data, new_names)
 # save in outputs
 fwrite(data,file = "data/output/data_rfid_tags.csv")
 ```
+
+```{r}
+# plot number of rfid tags per year
+plot_rfid_per_year = ggplot(data)+
+  geom_bar(
+    aes(x = year(date))
+  )+
+  labs(x = "Year", y = "Tags per year")
+
+# save plot
+ggsave(
+  plot_rfid_per_year,
+  filename = "figures/plot_rfid_per_year.png",
+  height = 6, width = 6
+)
+```
+
