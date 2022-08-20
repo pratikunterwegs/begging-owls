@@ -1,0 +1,62 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(readxl)
+library(data.table)
+```
+
+## Load 2016 adult data
+
+```{r}
+data_id_adults_2016 = read_excel(
+  path = "data/raw/2016 nest data/data barn owls adults and nestlings 2016.xlsx", 
+  sheet = 3
+) |> setDT()
+```
+
+```{r}
+# select useful columns
+data_id_adults_2016 = data_id_adults_2016[, c("BOX#", "Year", "Tag...1", "Date",
+                        "agenestlings_atcapture",
+                        "Band number", "Age", "Sex...15", "clutch size",
+                        "# eggs not hatching", "brood size at hatching",
+                        "brood size 40 days old", "laying date", 
+                        "Wing length", "Mass", "Aggressiveness", "Agitation")]
+```
+
+```{r}
+new_names = c(
+  "nestbox", "year", "tag", "date",
+  "age_nestlings_at_capture", "band_number", "age", "sex",
+  "clutch_size", "eggs_not_hatching", "brood_size_hatching",
+  "brood_size_40days", "laying_date", "wing_length", "mass",
+  "aggressiveness", "agitation"
+)
+
+setnames(data_id_adults_2016, new_names)
+data_id_adults_2016[, date := as.Date(date)]
+```
+
+## Load 2016 juveniles data
+
+```{r}
+data_id_juveniles_2016 = read_excel(
+  path = "data/raw/2016 nest data/data barn owls adults and nestlings 2016.xlsx", 
+  sheet = 4
+) |> setDT()
+```
+
+
+## Load 2017 data
+
+```{r}
+data_id_juveniles_2016 = data_id_juveniles_2016[, c("tag", "Nestbox n°",
+              "Date...4", "Band number", "Age", "brood size", "Wing length",
+              "Weight", "Agressiveness (0 to 3)", "Aggetation (0 to 3)",
+              "FTag", "fBand number", "Sex", "clutch size", "mTag", "mBand number") ]
+```
+
