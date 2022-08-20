@@ -110,3 +110,6 @@ manuscript/
 
 # ignore local data archive
 archive*
+
+# ignore raw data
+data/raw/
