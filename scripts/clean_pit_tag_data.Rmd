@@ -1,0 +1,50 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(data.table)
+library(readxl)
+```
+
+## Load data
+
+```{r}
+# load data
+data_pit_tags = read_excel("data/raw/1List PIT tags.xlsx") |> setDT()
+
+# HourNum issue, as year is added as 1899, incorrect. take hour and minute
+# value from hournum and combine with date in Date column
+```
+
+## Clean data
+
+```{r}
+# make a copy
+data = copy(data_pit_tags)
+# select useful columns
+data = data[, c("nestbox", "Tag", "tag2", "RFID", "Date",
+                "Band number", "RINGING Age", "Sex")]
+```
+
+```{r}
+# convert RFID to character without decimal
+data[, c("RFID") := list(
+  stringr::str_remove(RFID, "\\.")
+)]
+
+# convert all band numbers to capital GG
+data[, c("Band number") := stringr::str_replace(`Band number`, "gg", "GG")]
+```
+
+```{r}
+# assign lowercase names with underscores
+new_names = stringr::str_to_lower(names(data)) |> stringr::str_replace(" ", "_")
+setnames(data, new_names)
+```
+
+```{r}
+# save in outputs
+fwrite(data,file = "data/output/data_rfid_tags.csv")
+```
