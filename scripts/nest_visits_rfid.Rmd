@@ -1,0 +1,52 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(data.table)
+library(ggplot2)
+```
+
+## Handle nest box data
+
+```{r}
+# read data and save
+nb_loc = read_excel(path = "data/raw/2016 nest data/Charter nest boxes.xlsx", sheet = 2)
+setnames(nb_loc, c("nestbox", "species", "sp2", "long", "lat"))
+setDT(nb_loc)
+
+nb_loc = nb_loc[, c("nestbox", "species", "long", "lat")]
+
+# rename nestbox
+nb_loc[, nestbox := stringr::str_replace(nestbox, "ha", "Ha")]
+
+# save file
+fwrite(nb_loc, "data/output/nestbox_locations.csv")
+```
+
+```{r}
+# read data
+dirs = list.dirs("data/raw/2020_rfid_data")
+
+# read files
+data = lapply(dirs, visits_from_rfid)
+# combine data and link visits
+data = rbindlist(data)
+```
+
+## Combine with location data
+
+```{r}
+data = merge.data.table(data, nb_loc, by = "nestbox")
+data[, duration := as.numeric(visit_end - visit_start)]
+```
+
+```{r}
+data_bipartite = data[, list(duration = sum(duration)), by = c("tag", "nestbox")]
+data_bipartite[, webID := 1]
+```
+
+```{r}
+(bipartite::frame2webs(data_bipartite, varnames = c("tag", "nestbox", "webID", "duration")))[[1]] |> bipartite::plotweb()
+```
